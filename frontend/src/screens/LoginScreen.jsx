@@ -3,10 +3,11 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { BASE_URL } from "../constants/url";
+import { useNavigate } from "react-router-dom";
 
 const LoginScreen = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
-  console.log(formData)
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -16,9 +17,14 @@ const LoginScreen = () => {
     e.preventDefault();
     try {
       const { data } = await axios.post(`${BASE_URL}/users/login`, formData);
-      console.log(data);
+      if (data.message) {
+        toast.success(data.message);
+        navigate("/books");
+        localStorage.setItem("userInfo", JSON.stringify(data));
+      }
+      console.log(data, "19");
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Login failed");
+      toast.error(err?.response?.data?.message);
     }
   };
   console.log(formData, "11");
